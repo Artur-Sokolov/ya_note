@@ -86,8 +86,15 @@ class TestRoutes(TestCase):
                 redirect_url = f'{login_url}?next={url}'
                 response = self.client.get(url)
                 self.assertRedirects(response, redirect_url)
-                
-    def test_404_for_nonexistent_url(self):
-        """Тест для несуществующего маршрута, должен вернуть 404"""
-        response = self.client.get('/notes/nonexistent-url/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+    def test_auth_pages_are_accessible(self):
+        urls = (
+            ('users:login', None, HTTPStatus.OK),
+            ('users:logout', None, HTTPStatus.OK),
+            ('users:signup', None, HTTPStatus.OK),
+        )
+        for name, args, expected_status in urls:
+            with self.subTest(name=name):
+                url = reverse(name, args=args)
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, expected_status)
