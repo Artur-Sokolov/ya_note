@@ -8,6 +8,7 @@ from notes.models import Note
 
 User = get_user_model()
 
+
 class TestRoutes(TestCase):
 
     @classmethod
@@ -19,7 +20,6 @@ class TestRoutes(TestCase):
             text='Текст',
             author=cls.author
             )
-
 
     def test_pages_availability(self):
         """Тест доступности страниц без авторизации"""
@@ -37,7 +37,7 @@ class TestRoutes(TestCase):
                 url = reverse(name, args=args)
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, expected_status)
-                
+
     def test_pages_availability(self):
         """Тест доступности страниц c авторизацией"""
         self.client.force_login(self.author)
@@ -54,7 +54,7 @@ class TestRoutes(TestCase):
                 url = reverse(name, args=args)
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, expected_status)
-                
+
     def test_availability_for_different_users(self):
         """Тест доступности страниц редактирования и удаления заметки для разных пользователей"""
         users_statuses = (
@@ -68,7 +68,7 @@ class TestRoutes(TestCase):
                     url = reverse(name, args=(self.note.slug,))
                     response = self.client.get(url)
                     self.assertEqual(response.status_code, expected_status)
-                    
+
     def test_redirect_for_anonymous_client(self):
         """Тест редиректа неавторизованного пользователя"""
         login_url = reverse('users:login')

@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -7,9 +6,6 @@ from notes.models import Note
 from notes.forms import NoteForm
 
 User = get_user_model()
-
-class TestHomePage(TestCase):
-    HOME_URL = reverse('notes:home')
 
 class TestDetailPage(TestCase):
 
@@ -21,15 +17,17 @@ class TestDetailPage(TestCase):
             title='Зметка пользователя 1',
             text='Просто текст1.',
             author=cls.user1,
+            slug='note1',
         )
         cls.note2 = Note.objects.create(
             title='Зметка пользователя 2',
             text='Просто текст2.',
             author=cls.user2,
+            slug='note2',
         )
         cls.list_url = reverse('notes:list')
         cls.add_url = reverse('notes:add')
-        cls.edit_url = reverse('notes:edit', args=(cls.note1.slug))
+        cls.edit_url = reverse('notes:edit', args=(cls.note1.slug,))
         
     def test_note_appears_in_object_list(self):
         """Проверяем, что заметка отображается в object_list у своего автора."""
@@ -51,10 +49,12 @@ class TestDetailPage(TestCase):
         
     def test_anonymous_client_has_no_form(self):
         response_add = self.client.get(self.add_url)
+        if response_add.context is not None:
+            self.assertNotIn('form', response_add.context)
         response_edit = self.client.get(self.edit_url)
-        self.assertNotIn('form', response_add.context)
-        self.assertNotIn('form', response_edit.context)
-        
+        if response_edit.context is not None:
+            self.assertNotIn('form', response_edit.context)
+
     def test_authorized_client_has_form(self):
         self.client.force_login(self.user1)
         response_add = self.client.get(self.add_url)
